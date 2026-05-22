@@ -3,7 +3,8 @@
   "build": {
     "builder": "RAILPACK",
     "buildCommand": "npm install",
-    "watchPatterns": ["src/**/*", "package.json"]
+    "watchPatterns": ["src/**/*", "package.json"],
+    "nixpacksVersion": "1"
   },
   "deploy": {
     "startCommand": "node src/index.js",
