@@ -1,4 +1,5 @@
-const { Client, LocalAuth } = require('whatsapp-web.js');
+let Client, LocalAuth;
+try { ({ Client, LocalAuth } = require('whatsapp-web.js')); } catch { console.log('whatsapp-web.js not installed — WhatsApp disabled'); }
 const qrcode = require('qrcode');
 const config = require('../config');
 
