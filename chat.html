@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>درب - سكرتيرك الخاص</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+body { background: #1a1a2e; color: #eee; height: 100vh; display: flex; flex-direction: column; }
+.header { background: #16213e; padding: 15px; text-align: center; border-bottom: 2px solid #0f3460; }
+.header h1 { font-size: 22px; color: #e94560; margin-bottom: 5px; }
+.header p { font-size: 12px; color: #888; }
+.chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+.msg { max-width: 85%; padding: 10px 14px; border-radius: 12px; line-height: 1.6; font-size: 14px; white-space: pre-wrap; }
+.user { background: #0f3460; align-self: flex-end; border-bottom-left-radius: 4px; }
+.bot { background: #16213e; align-self: flex-start; border-bottom-right-radius: 4px; }
+.input-area { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #333; background: #16213e; }
+.input-area input { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #333; background: #1a1a2e; color: #eee; font-size: 14px; }
+.input-area input:focus { outline: none; border-color: #e94560; }
+.input-area button { padding: 12px 24px; border-radius: 25px; border: none; background: #e94560; color: #fff; font-weight: bold; cursor: pointer; }
+.input-area button:hover { background: #c73650; }
+.eg { color: #888; font-size: 11px; text-align: center; padding: 5px; }
+.loading { color: #888; font-size: 12px; text-align: center; padding: 5px; }
+.status { position: absolute; top: 15px; left: 15px; font-size: 11px; padding: 4px 10px; border-radius: 10px; }
+.online { background: #00a86b; color: #fff; }
+.offline { background: #e94560; color: #fff; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div id="status" class="status offline">⚫</div>
+  <h1>🤖 درب</h1>
+  <p>سكرتيرك الخاص — وثائق، مهام، استفسارات حكومية</p>
+</div>
+<div class="chat" id="chat">
+  <div class="msg bot">مرحباً! أنا درب 👋<br><br>أقدر أساعدك في:<br>📅 إضافة مواعيد<br>🏛️ استفسارات حكومية<br>🗂️ متابعة المهام<br><br>اكتب أي شيء وبدينا!</div>
+</div>
+<div class="input-area">
+  <input id="input" type="text" placeholder="اكتب رسالتك هنا..." onkeydown="if(event.key==='Enter') send()">
+  <button onclick="send()">إرسال</button>
+</div>
+<div class="eg">يقترح عليك: "وش خطوات تجديد الإقامة؟" — "صباح الخير" — "عندي دكتور بكره"</div>
+
+<script>
+// Change this to your production API URL when deploying
+const API_BASE = 'http://localhost:5000';
+
+let token = '';
+
+async function register() {
+  try {
+    const r = await fetch(API_BASE + '/api/auth/register', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email:'u@u.com',password:'123456',name:'Smual'})
+    });
+    const d = await r.json();
+    return d.token || d;
+  } catch { return null; }
+}
+
+async function login() {
+  try {
+    const r = await fetch(API_BASE + '/api/auth/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email:'u@u.com',password:'123456'})
+    });
+    const d = await r.json();
+    return d.token;
+  } catch { return null; }
+}
+
+async function init() {
+  const st = document.getElementById('status');
+  st.textContent = '⏳';
+  st.className = 'status offline';
+
+  const s = await check();
+  if (!s) { st.textContent = '❌ السيرفر مو شغال!'; st.className = 'status offline'; return; }
+  console.log('Connecting to:', API_BASE);
+
+  token = await login();
+  if (!token) token = await register();
+  if (!token) { st.textContent = '❌ فشل تسجيل الدخول'; st.className = 'status offline'; return; }
+
+  st.textContent = '✅ متصل';
+  st.className = 'status online';
+}
+
+async function check() {
+  try { const r = await fetch(API_BASE + '/api/health'); return r.ok; }
+  catch { return false; }
+}
+
+async function send() {
+  const input = document.getElementById('input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  const chat = document.getElementById('chat');
+  chat.innerHTML += `<div class="msg user">${escapeHtml(msg)}</div>`;
+  chat.innerHTML += `<div class="loading" id="loading">⏳ جاري التفكير...</div>`;
+  chat.scrollTop = chat.scrollHeight;
+
+  if (!token) {
+    document.getElementById('loading').remove();
+    chat.innerHTML += `<div class="msg bot">❌ ما قدرت أسجل دخول. شغّل start.bat أول.</div>`;
+    chat.scrollTop = chat.scrollHeight;
+    return;
+  }
+
+  try {
+    const r = await fetch(API_BASE + '/api/chat', {
+      method: 'POST', headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({message: msg})
+    });
+    const d = await r.json();
+    document.getElementById('loading').remove();
+    chat.innerHTML += `<div class="msg bot">${escapeHtml(d.response || d.reply || d.error || '(فاضية)')}</div>`;
+  } catch(e) {
+    document.getElementById('loading').remove();
+    chat.innerHTML += `<div class="msg bot">❌ خطأ: ${escapeHtml(e.message)}</div>`;
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function escapeHtml(t) {
+  const d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+
+init();
+</script>
+</body>
+</html>

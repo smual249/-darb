@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>درب - سكرتيرك الشخصي</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+body{background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+
+/* HEADER */
+header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:16px;text-align:center;position:relative;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+header h1{color:#e94560;font-size:20px}
+header p{color:#8899aa;font-size:11px;margin-top:2px}
+#conn{position:absolute;left:10px;top:12px;padding:3px 8px;border-radius:6px;font-size:10px;color:#fff;background:#555}
+
+/* TABS */
+.tabs{display:flex;background:#fff;overflow-x:auto;border-bottom:1px solid #e0e0e0;position:sticky;top:0;z-index:10}
+.tab{padding:12px 14px;font-size:13px;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:.2s;white-space:nowrap;text-align:center;flex:1;min-width:60px}
+.tab.active{color:#e94560;border-bottom-color:#e94560;font-weight:600}
+.tab:hover{background:#fafafa;color:#333}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* MAIN CONTENT */
+.main{padding:12px;max-width:800px;margin:auto;width:100%}
+
+/* CARD */
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.card h3{font-size:15px;margin-bottom:10px;color:#1a1a2e}
+
+/* ORGANIZE PAGE */
+.textarea-box textarea{width:100%;min-height:140px;padding:14px;border-radius:12px;border:1px solid #ddd;background:#fafafa;font-size:15px;outline:none;transition:.2s;resize:vertical;line-height:1.7}
+.textarea-box textarea:focus{border-color:#e94560;background:#fff;box-shadow:0 0 0 3px rgba(233,69,96,.08)}
+.textarea-box .hint{color:#999;font-size:12px;margin-top:6px;line-height:1.5}
+.btn-main{background:#e94560;color:#fff;border:none;padding:12px 30px;border-radius:25px;cursor:pointer;font-size:15px;font-weight:600;transition:.2s;margin-top:8px}
+.btn-main:hover{background:#c73650}
+.btn-main:disabled{background:#ccc;cursor:default}
+
+/* RESULTS */
+.result-section{margin-top:4px}
+.result-section .group-title{font-size:15px;font-weight:600;padding:10px 0 6px;border-bottom:1px solid #eee;margin-top:12px}
+.priority-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f8f9fa;border-radius:10px;margin:5px 0;transition:.2s;border:1px solid transparent}
+.priority-item:hover{border-color:#e94560;background:#fff}
+.priority-item .icon{font-size:22px;min-width:30px}
+.priority-item .info{flex:1}
+.priority-item .info .title{font-size:14px;font-weight:500}
+.priority-item .info .meta{font-size:12px;color:#888;margin-top:2px}
+.priority-item .priority-badge{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:500}
+.p-badge-urgent{background:#ffe0e0;color:#d32f2f}
+.p-badge-high{background:#fff0e0;color:#e65100}
+.p-badge-medium{background:#fff8e0;color:#f57f17}
+.p-badge-low{background:#e8f5e9;color:#2e7d32}
+
+.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn-s{background:#1a1a2e;color:#fff;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:13px;transition:.2s}
+.btn-s:hover{background:#16213e}
+.btn-g{background:#f0f2f5;color:#333;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:13px;transition:.2s}
+.btn-g:hover{background:#e0e0e0}
+.btn-success{background:#00a86b;color:#fff;border:none;padding:10px 22px;border-radius:25px;cursor:pointer;font-size:14px;font-weight:600;transition:.2s;margin-top:5px}
+.btn-success:hover{background:#008f5a}
+
+/* SUMMARY BADGE */
+.summary-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.summary-badge{background:#f8f9fa;padding:8px 14px;border-radius:10px;font-size:13px;display:flex;align-items:center;gap:5px}
+.summary-badge span{font-weight:600;color:#e94560}
+
+/* DOCS PAGE */
+.doc-item{padding:10px 12px;background:#f8f9fa;border-radius:10px;margin:4px 0;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.task-item{padding:8px 12px;background:#f8f9fa;border-radius:8px;margin:3px 0;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.platform-item{padding:10px;background:#f8f9fa;border-radius:10px;margin:4px}
+.platform-item a{color:#e94560;text-decoration:none}
+.fine-item{padding:6px 0;font-size:13px;border-bottom:1px solid #eee}
+.loading{color:#999;text-align:center;font-size:13px;padding:12px}
+.badge{padding:2px 8px;border-radius:6px;font-size:11px}
+.badge-red{background:#ffe0e0;color:#d32f2f}
+.badge-yellow{background:#fff8e0;color:#f57f17}
+.badge-green{background:#e8f5e9;color:#2e7d32}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+input[type=text],input[type=date],input[type=email],input[type=password],select{padding:10px 14px;border-radius:12px;border:1px solid #ddd;background:#fafafa;font-size:14px;outline:none;width:100%;margin:4px 0}
+input:focus,select:focus{border-color:#e94560;background:#fff;box-shadow:0 0 0 3px rgba(233,69,96,.08)}
+label{font-size:12px;color:#666;display:block;margin:8px 0 2px}
+.no-items{color:#999;text-align:center;padding:20px;font-size:14px}
+
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div id="conn">⏳</div>
+  <h1>🤖 درب</h1>
+  <p>سكرتيرك الشخصي — يرتب برامجك ويتبع وثائقك</p>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('organize')">🎯 تنظيم</div>
+  <div class="tab" onclick="switchTab('docs')">📋 وثائقي</div>
+  <div class="tab" onclick="switchTab('tasks')">✅ مهامي</div>
+  <div class="tab" onclick="switchTab('info')">🏛️ معلومات</div>
+</div>
+
+<!-- ========== ORGANIZE PAGE ========== -->
+<div id="page-organize" class="page active">
+  <div class="main">
+    <div class="card textarea-box">
+      <h3>✍️ اكتب برامجك كلها هنا</h3>
+      <textarea id="programsInput" placeholder="مثال:&#10;عندي موعد دكتور بكره الساعة 3&#10;عزيمة العرس الجمعة&#10;سفر للرياض الشهر الجاي&#10;تجديد إقامة ما عار متين&#10;مقابلة وظيفة الأسبوع الجاي"></textarea>
+      <div class="hint">💡 اكتب كل برامجك مرّة وحدة — بفصلها ويرتبها حسب الأولوية. استخدم "و" أو "،" أو سطر جديد.</div>
+      <button class="btn-main" id="organizeBtn" onclick="organize()">🎯 نظمها</button>
+    </div>
+
+    <div id="resultArea"></div>
+  </div>
+</div>
+
+<!-- ========== DOCS PAGE ========== -->
+<div id="page-docs" class="page">
+  <div class="main">
+    <div class="card">
+      <h3>📋 حالة وثائقي</h3>
+      <div id="docAlerts"></div>
+      <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">
+        <button class="btn-g" onclick="checkDocs()">🔍 فحص الصلاحية</button>
+        <button class="btn-g" onclick="showDocTypes()">📋 الأنواع</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>➕ إضافة وثيقة</h3>
+      <label>النوع</label>
+      <select id="newDocType">
+        <option value="iqama">🆔 إقامة</option>
+        <option value="driving_license">🚗 رخصة قيادة</option>
+        <option value="car_registration">🚙 استمارة سيارة</option>
+        <option value="passport">📘 جواز سفر</option>
+        <option value="insurance">🛡️ تأمين</option>
+        <option value="tenancy">🏠 عقد إيجار</option>
+      </select>
+      <label>تاريخ الانتهاء</label>
+      <input type="date" id="newDocDate">
+      <button class="btn-main" onclick="addDoc()" style="padding:8px 18px;font-size:13px;margin-top:4px">➕ إضافة</button>
+    </div>
+    <div class="card">
+      <h3>📦 وثائقي المسجلة</h3>
+      <div id="myDocs"></div>
+      <button class="btn-g" onclick="loadMyDocs()" style="margin-top:6px">🔄 تحديث</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== TASKS PAGE ========== -->
+<div id="page-tasks" class="page">
+  <div class="main">
+    <div class="card">
+      <h3>➕ مهمة جديدة</h3>
+      <input id="taskTitle" placeholder="وش المهمة؟">
+      <div class="grid">
+        <div>
+          <label>النوع</label>
+          <select id="taskCat">
+            <option value="medical">🏥 طبي</option>
+            <option value="travel">✈️ سفر</option>
+            <option value="work">💼 دوام</option>
+            <option value="meeting">🤝 اجتماع</option>
+            <option value="party">🎉 عزيمة</option>
+            <option value="general">📋 عام</option>
+          </select>
+        </div>
+        <div>
+          <label>التاريخ</label>
+          <input type="date" id="taskDate">
+        </div>
+      </div>
+      <button class="btn-main" onclick="addTask()" style="padding:8px 18px;font-size:13px;margin-top:4px">➕ إضافة</button>
+    </div>
+    <div class="card">
+      <h3>📋 كل المهام</h3>
+      <div id="myTasks"></div>
+      <button class="btn-g" onclick="loadTasks()" style="margin-top:6px">🔄 تحديث</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== INFO PAGE ========== -->
+<div id="page-info" class="page">
+  <div class="main">
+    <div class="card">
+      <h3>🔗 المنصات الرسمية</h3>
+      <div id="platformsList"></div>
+      <button class="btn-g" onclick="showPlatforms()">🔄 عرض</button>
+    </div>
+    <div class="card">
+      <h3>⚠️ المخالفات المرورية</h3>
+      <div id="finesList"></div>
+      <button class="btn-g" onclick="showFines()">🔄 عرض</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Change this to your production API URL when deploying
+const BASE = 'http://localhost:5000';
+let token = '';
+
+// ===== INIT =====
+async function init(){
+  const c=document.getElementById('conn');
+  try{
+    const r=await fetch(BASE+'/api/health');
+    if(!r.ok) throw Error();
+    c.textContent='✅ متصل';c.style.background='#00a86b';
+    token = await login();
+    if(!token) token = await register();
+    if(!token){c.textContent='❌ فشل الدخول';c.style.background='#e94560';return}
+    loadMyDocs(); loadTasks();
+  }catch{
+    c.textContent='❌ شغّل start.bat';c.style.background='#e94560';
+  }
+}
+async function register(){
+  try{const r=await fetch(BASE+'/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'u@u.com',password:'123456',name:'Smual'})});const d=await r.json();return d.token||null}catch{return null}
+}
+async function login(){
+  try{const r=await fetch(BASE+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'u@u.com',password:'123456'})});const d=await r.json();return d.token}catch{return null}
+}
+init();
+
+// ===== TABS =====
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const tabs=['organize','docs','tasks','info'];
+  document.querySelector(`.tab:nth-child(${tabs.indexOf(name)+1})`).classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='docs'){loadMyDocs()}
+  if(name==='tasks')loadTasks();
+}
+
+// ===== ORGANIZE =====
+async function organize(){
+  const ta=document.getElementById('programsInput');
+  const text=ta.value.trim();
+  if(!text||text.length<3)return;
+  const btn=document.getElementById('organizeBtn');
+  btn.disabled=true;btn.textContent='⏳ جاري الترتيب...';
+
+  const div=document.getElementById('resultArea');
+  div.innerHTML='<div class="loading">⏳ جاري تحليل برامجك...</div>';
+
+  try{
+    const r=await fetch(BASE+'/api/organize',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({text})});
+    const data=await r.json();
+
+    if(data.error){div.innerHTML='<div class="card" style="color:#e94560">❌ '+esc(data.error)+'</div>';btn.disabled=false;btn.textContent='🎯 نظمها';return}
+
+    let html='<div class="result-section">';
+
+    // Summary
+    html+=`<div class="summary-row">
+      <div class="summary-badge">📊 <b>${data.summary.total}</b> برنامج</div>
+      ${data.summary.urgent?`<div class="summary-badge">⛔ <b>${data.summary.urgent}</b> عاجل</div>`:''}
+      ${data.summary.high?`<div class="summary-badge">🔴 <b>${data.summary.high}</b> عالية</div>`:''}
+      ${data.summary.medium?`<div class="summary-badge">🟡 <b>${data.summary.medium}</b> متوسطة</div>`:''}
+      ${data.summary.noDate?`<div class="summary-badge">📅 <b>${data.summary.noDate}</b> بدون تاريخ</div>`:''}
+    </div>`;
+
+    // Sorted items
+    data.sorted.forEach(item=>{
+      const pClass='p-badge-'+item.priority;
+      const dateStr=item.dueDateFormatted||'بدون تاريخ';
+      html+=`<div class="priority-item">
+        <div class="icon">${item.icon}</div>
+        <div class="info">
+          <div class="title">${esc(item.title)}</div>
+          <div class="meta">📅 ${dateStr} ${item.hasNoDate?'— يحدد لاحقاً':''}</div>
+        </div>
+        <div class="priority-badge ${pClass}">${item.priorityIcon} ${item.priorityLabel}</div>
+      </div>`;
+    });
+
+    // Confirm button
+    html+=`<div style="margin-top:12px">
+      <button class="btn-success" onclick="confirmAll()">✅ تأكيد الكل وإضافة للمهام</button>
+    </div>`;
+
+    html+='</div>';
+    div.innerHTML=html;
+    window._lastOrganized = data.sorted;
+  }catch(e){
+    div.innerHTML='<div class="card" style="color:#e94560">❌ خطأ: '+esc(e.message)+'</div>';
+  }
+
+  btn.disabled=false;btn.textContent='🎯 نظمها';
+}
+
+async function confirmAll(){
+  if(!window._lastOrganized||!window._lastOrganized.length)return;
+  const btn=document.querySelector('.btn-success');
+  btn.disabled=true;btn.textContent='⏳ جاري الإضافة...';
+
+  try{
+    const r=await fetch(BASE+'/api/organize/confirm',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({items:window._lastOrganized})});
+    const data=await r.json();
+    if(data.success){
+      alert('✅ تمت إضافة '+data.count+' برنامج للمهام');
+      window._lastOrganized=null;
+      loadTasks();
+      // Clear input
+      document.getElementById('programsInput').value='';
+      document.getElementById('resultArea').innerHTML='';
+    }else{
+      alert('❌ '+data.error);
+    }
+  }catch(e){
+    alert('❌ '+e.message);
+  }
+  btn.disabled=false;btn.textContent='✅ تأكيد الكل وإضافة للمهام';
+}
+
+// ===== DOCS =====
+async function checkDocs(){
+  const d=document.getElementById('docAlerts');
+  d.innerHTML='<div class="loading">⏳ جاري الفحص...</div>';
+  try{
+    const r=await fetch(BASE+'/api/documents/check-expiry',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}});
+    const dd=await r.json();
+    d.innerHTML=dd.alerts?.length?dd.alerts.map(a=>`<div class="doc-item"><span>${a.icon||'📋'} ${a.label||a.docType}</span><span>${a.message}</span></div>`).join(''):'<span style="color:#00a86b">✅ كل الوثائق سارية</span>';
+  }catch(e){d.innerHTML='❌ '+e.message}
+}
+async function addDoc(){
+  const t=document.getElementById('newDocType').value;
+  const dt=document.getElementById('newDocDate').value;
+  if(!dt){alert('اختر تاريخ الانتهاء');return}
+  const r=await fetch(BASE+'/api/documents',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({docType:t,expiryDate:dt})});
+  const d=await r.json();
+  alert(d.status?.status==='can_renew'||d.status?.status==='active'?'✅ تمت الإضافة':'✅ تم');
+  loadMyDocs();
+}
+async function loadMyDocs(){
+  const div=document.getElementById('myDocs');
+  div.innerHTML='<div class="loading">⏳...</div>';
+  try{
+    const r=await fetch(BASE+'/api/documents',{headers:{'Authorization':'Bearer '+token}});
+    const dd=await r.json();
+    if(!dd.length){div.innerHTML='<div class="no-items">📭 ما عندك وثائق مسجلة</div>';return}
+    div.innerHTML=dd.map(d=>{
+      const s=d.expiryDate?new Date(d.expiryDate):null;
+      const days=s?Math.ceil((s-new Date())/86400000):null;
+      const cls=days&&days<30?'badge-red':days&&days<90?'badge-yellow':'badge-green';
+      return `<div class="doc-item"><span>${d.icon||'📋'} ${d.labelAr||d.docType}</span><span>${s?s.toLocaleDateString('ar-SA'):'—'} <span class="badge ${cls}">متبقي ${days??'—'} يوم</span></span></div>`;
+    }).join('');
+  }catch(e){div.innerHTML='❌ '+e.message}
+}
+async function showDocTypes(){
+  const types=[{docType:'iqama',labelAr:'الإقامة',icon:'🆔',tip:'جدد قبل 90 يوم من الانتهاء'},{docType:'driving_license',labelAr:'رخصة القيادة',icon:'🚗',tip:'جدد قبل 180 يوم من الانتهاء'},{docType:'car_registration',labelAr:'استمارة السيارة',icon:'🚙',tip:'تأكد من سريان التأمين'},{docType:'passport',labelAr:'جواز السفر',icon:'📘',tip:'صلاحية 5 سنوات'},{docType:'insurance',labelAr:'التأمين',icon:'🛡️',tip:'مطلوب قانونياً للقيادة'},{docType:'tenancy',labelAr:'عقد الإيجار',icon:'🏠',tip:'وثقه في إيجار'}];
+  const div=document.getElementById('docAlerts');
+  div.innerHTML='<div class="grid">'+types.map(t=>`<div style="background:#f8f9fa;padding:12px;border-radius:10px;text-align:center;font-size:13px;cursor:pointer">${t.icon}<br><b>${t.labelAr}</b><br><span style="color:#888;font-size:11px">${t.tip}</span></div>`).join('')+'</div>';
+}
+
+// ===== TASKS =====
+async function addTask(){
+  const title=document.getElementById('taskTitle').value.trim();
+  if(!title){alert('اكتب اسم المهمة');return}
+  const cat=document.getElementById('taskCat').value;
+  const dt=document.getElementById('taskDate').value;
+  const body={title,description:title,category:cat,priority:'medium'};
+  if(dt)body.dueDate=dt;
+  try{
+    const r=await fetch(BASE+'/api/tasks',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)});
+    await r.json();
+    alert('✅ تمت الإضافة');
+    document.getElementById('taskTitle').value='';
+    document.getElementById('taskDate').value='';
+    loadTasks();
+  }catch(e){alert('❌ '+e.message)}
+}
+async function loadTasks(){
+  const div=document.getElementById('myTasks');
+  div.innerHTML='<div class="loading">⏳...</div>';
+  try{
+    const r=await fetch(BASE+'/api/tasks',{headers:{'Authorization':'Bearer '+token}});
+    const dd=await r.json();
+    if(!dd.length){div.innerHTML='<div class="no-items">📭 ما عندك مهام</div>';return}
+    const icons={urgent:'⛔',high:'🔴',medium:'🟡',low:'🟢'};
+    div.innerHTML=dd.map(t=>{
+      const d=t.dueDate?new Date(t.dueDate):null;
+      return `<div class="task-item"><span>${icons[t.priority]||'📌'} ${t.title}</span><span style="color:#666;font-size:12px">${d?d.toLocaleDateString('ar-SA',{month:'short',day:'numeric'}):''}</span></div>`;
+    }).join('');
+  }catch(e){div.innerHTML='❌ '+e.message}
+}
+
+// ===== INFO =====
+async function showPlatforms(){
+  const div=document.getElementById('platformsList');
+  div.innerHTML='<div class="loading">⏳...</div>';
+  try{
+    const r=await fetch(BASE+'/api/documents/platforms',{headers:{'Authorization':'Bearer '+token}});
+    const d=await r.json();
+    div.innerHTML=d.map(p=>`<div class="platform-item">🏛️ <b>${p.nameAr}</b><br><a href="${p.url}" target="_blank">${p.url}</a><br><span style="color:#666;font-size:12px">${p.descAr||''}</span></div>`).join('');
+  }catch(e){div.innerHTML='❌ '+e.message}
+}
+async function showFines(){
+  const div=document.getElementById('finesList');
+  div.innerHTML='<div class="loading">⏳...</div>';
+  try{
+    const r=await fetch(BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({message:'كم غرامة المخالفات'})});
+    const d=await r.json();
+    const txt=d.response||d.reply||'';
+    div.innerHTML=`<div style="background:#f8f9fa;padding:14px;border-radius:12px;font-size:14px;white-space:pre-wrap;line-height:1.7">${esc(txt)}</div>`;
+  }catch(e){div.innerHTML='❌ '+e.message}
+}
+
+function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
+</script>
+</body>
+</html>
